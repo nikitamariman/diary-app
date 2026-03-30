@@ -5,7 +5,7 @@
 ## Демо
 
 - **Веб-версия:** [https://nikitamariman.github.io/diary-app/](https://nikitamariman.github.io/diary-app/)
-- **Десктопное приложение:** [Скачать .exe](https://github.com/nikitamariman/diary-desktop/releases)
+- **Десктопное приложение:** [Скачать .exe](https://github.com/nikitamariman/diary-app/releases)
 
 ## Технологии
 
