@@ -11,9 +11,15 @@ export function DateNav({ selectedDate, onSelect, entries }) {
       },
       60 * 60 * 1000,
     );
-
     return () => clearInterval(interval);
   }, []);
+
+  const getLocalDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
 
   const recentDates = useMemo(() => {
     const dates = [];
@@ -21,7 +27,7 @@ export function DateNav({ selectedDate, onSelect, entries }) {
     for (let i = 0; i < 5; i++) {
       const date = new Date(now);
       date.setDate(now.getDate() - i);
-      dates.push(date.toISOString().split("T")[0]);
+      dates.push(getLocalDate(date));
     }
     return dates;
   }, [currentDate]);
@@ -29,23 +35,17 @@ export function DateNav({ selectedDate, onSelect, entries }) {
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
     const now = new Date();
-    const today = now.toISOString().split("T")[0];
-    const yesterday = new Date(now);
-    yesterday.setDate(now.getDate() - 1);
-    const yesterdayStr = yesterday.toISOString().split("T")[0];
+    const today = getLocalDate(now);
+    const yesterdayDate = new Date(now);
+    yesterdayDate.setDate(now.getDate() - 1);
+    const yesterday = getLocalDate(yesterdayDate);
 
     if (dateStr === today) return "сегодня";
-    if (dateStr === yesterdayStr) return "вчера";
-
+    if (dateStr === yesterday) return "вчера";
     return date.toLocaleDateString("ru-RU", { day: "numeric", month: "short" });
   };
 
   const hasEntry = (date) => entries.some((entry) => entry.date === date);
-
-  const handleDateSelect = (dateStr) => {
-    onSelect(dateStr);
-    setShowCalendar(false);
-  };
 
   const getMonthDates = () => {
     const now = new Date(selectedDate);
@@ -53,13 +53,10 @@ export function DateNav({ selectedDate, onSelect, entries }) {
     const month = now.getMonth();
     const lastDay = new Date(year, month + 1, 0);
     const days = [];
-
     for (let i = 1; i <= lastDay.getDate(); i++) {
       const date = new Date(year, month, i);
-      const dateStr = date.toISOString().split("T")[0];
-      days.push(dateStr);
+      days.push(getLocalDate(date));
     }
-
     return days;
   };
 
@@ -77,7 +74,6 @@ export function DateNav({ selectedDate, onSelect, entries }) {
           {recentDates.map((date) => {
             const isSelected = selectedDate === date;
             const hasEntryForDate = hasEntry(date);
-
             return (
               <button
                 key={date}
@@ -94,17 +90,13 @@ export function DateNav({ selectedDate, onSelect, entries }) {
                 {formatDate(date)}
                 {hasEntryForDate && (
                   <span
-                    className={`
-                    absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full
-                    ${isSelected ? "bg-white dark:bg-stone-900" : "bg-stone-500 dark:bg-stone-400"}
-                  `}
+                    className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full ${isSelected ? "bg-white dark:bg-stone-900" : "bg-stone-500 dark:bg-stone-400"}`}
                   />
                 )}
               </button>
             );
           })}
         </div>
-
         <button
           onClick={() => setShowCalendar(!showCalendar)}
           className="px-5 py-2.5 text-base border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors font-medium whitespace-nowrap"
@@ -120,9 +112,9 @@ export function DateNav({ selectedDate, onSelect, entries }) {
               onClick={() => {
                 const newDate = new Date(selectedDate);
                 newDate.setMonth(newDate.getMonth() - 1);
-                onSelect(newDate.toISOString().split("T")[0]);
+                onSelect(getLocalDate(newDate));
               }}
-              className="px-3 py-1 border border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors"
+              className="px-3 py-1 border border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700"
             >
               ←
             </button>
@@ -136,9 +128,9 @@ export function DateNav({ selectedDate, onSelect, entries }) {
               onClick={() => {
                 const newDate = new Date(selectedDate);
                 newDate.setMonth(newDate.getMonth() + 1);
-                onSelect(newDate.toISOString().split("T")[0]);
+                onSelect(getLocalDate(newDate));
               }}
-              className="px-3 py-1 border border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700 transition-colors"
+              className="px-3 py-1 border border-stone-200 dark:border-stone-600 bg-white dark:bg-stone-900 text-stone-700 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-700"
             >
               →
             </button>
@@ -167,11 +159,13 @@ export function DateNav({ selectedDate, onSelect, entries }) {
                 const date = new Date(dateStr);
                 const isSelected = selectedDate === dateStr;
                 const hasEntryForDate = hasEntry(dateStr);
-
                 return (
                   <button
                     key={dateStr}
-                    onClick={() => handleDateSelect(dateStr)}
+                    onClick={() => {
+                      onSelect(dateStr);
+                      setShowCalendar(false);
+                    }}
                     className={`
                       p-2 text-center text-sm transition-all relative
                       ${
@@ -185,10 +179,7 @@ export function DateNav({ selectedDate, onSelect, entries }) {
                     {date.getDate()}
                     {hasEntryForDate && (
                       <span
-                        className={`
-                        absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full
-                        ${isSelected ? "bg-white dark:bg-stone-900" : "bg-stone-500 dark:bg-stone-400"}
-                      `}
+                        className={`absolute bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 rounded-full ${isSelected ? "bg-white dark:bg-stone-900" : "bg-stone-500 dark:bg-stone-400"}`}
                       />
                     )}
                   </button>

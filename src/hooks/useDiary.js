@@ -8,7 +8,6 @@ export function useDiary(user) {
   const [deletedEntry, setDeletedEntry] = useState(null)
   const [showUndo, setShowUndo] = useState(false)
   const [undoTimeLeft, setUndoTimeLeft] = useState(5)
-  const [restoredDate, setRestoredDate] = useState(null)
   const undoTimeoutRef = useRef(null)
   const timerIntervalRef = useRef(null)
 
@@ -50,7 +49,22 @@ export function useDiary(user) {
   }, [entries])
 
   const saveEntry = useCallback(async (date, content) => {
-    if (!user || !content?.trim()) return false
+    if (!user) return false
+
+    // Если есть активное уведомление об удалении для этой даты — сбрасываем
+    if (deletedEntry && deletedEntry.date === date && showUndo) {
+      if (undoTimeoutRef.current) {
+        clearTimeout(undoTimeoutRef.current)
+        undoTimeoutRef.current = null
+      }
+      if (timerIntervalRef.current) {
+        clearInterval(timerIntervalRef.current)
+        timerIntervalRef.current = null
+      }
+      setDeletedEntry(null)
+      setShowUndo(false)
+      setUndoTimeLeft(5)
+    }
 
     const existing = getEntry(date)
     
@@ -81,7 +95,7 @@ export function useDiary(user) {
     }
     
     return true
-  }, [user, getEntry])
+  }, [user, getEntry, deletedEntry, showUndo])
 
   const deleteEntry = useCallback(async (date) => {
     if (!user) return false
@@ -92,7 +106,6 @@ export function useDiary(user) {
     setDeletedEntry(entry)
     setShowUndo(true)
     setUndoTimeLeft(5)
-    setRestoredDate(null)
     
     setEntries(prev => prev.filter(e => e.id !== entry.id))
 
@@ -128,7 +141,6 @@ export function useDiary(user) {
       setDeletedEntry(null)
       setShowUndo(false)
       setUndoTimeLeft(5)
-      setRestoredDate(null)
       undoTimeoutRef.current = null
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current)
@@ -140,7 +152,7 @@ export function useDiary(user) {
   }, [user, getEntry])
 
   const undoDelete = useCallback(async () => {
-    if (!deletedEntry) return false
+    if (!deletedEntry) return null
 
     if (undoTimeoutRef.current) {
       clearTimeout(undoTimeoutRef.current)
@@ -151,16 +163,17 @@ export function useDiary(user) {
       timerIntervalRef.current = null
     }
 
-    setEntries(prev => [...prev, deletedEntry].sort((a, b) => 
+    const restored = { ...deletedEntry }
+    
+    setEntries(prev => [...prev, restored].sort((a, b) => 
       new Date(b.date) - new Date(a.date)
     ))
     
-    setRestoredDate(deletedEntry.date)
     setDeletedEntry(null)
     setShowUndo(false)
     setUndoTimeLeft(5)
     
-    return true
+    return restored
   }, [deletedEntry])
 
   return { 
@@ -171,7 +184,6 @@ export function useDiary(user) {
     deleteEntry,
     undoDelete,
     showUndo,
-    undoTimeLeft,
-    restoredDate
+    undoTimeLeft
   }
 }

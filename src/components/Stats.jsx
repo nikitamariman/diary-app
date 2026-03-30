@@ -1,9 +1,8 @@
-export function Stats({ entries }) {
-  const totalEntries = entries.filter((e) => e.content.trim()).length;
+export function Stats({ entries, fontSize }) {
+  const totalEntries = entries.filter((e) => e.content?.trim()).length;
 
   const getStreak = () => {
     if (totalEntries === 0) return 0;
-
     const dates = entries
       .map((e) => e.date)
       .sort()
@@ -11,35 +10,37 @@ export function Stats({ entries }) {
     let streak = 0;
     const now = new Date();
     let currentDate = new Date(now);
-
     for (let i = 0; i < dates.length; i++) {
       const dateStr = currentDate.toISOString().split("T")[0];
       if (dates[i] === dateStr) {
         streak++;
         currentDate.setDate(currentDate.getDate() - 1);
-      } else {
-        break;
-      }
+      } else break;
     }
-
     return streak;
   };
 
   return (
-    <div className="grid grid-cols-2 gap-4 mt-8">
-      <div className="border border-stone-200 dark:border-stone-700 p-4 bg-white dark:bg-stone-900">
-        <div className="text-3xl font-light text-stone-800 dark:text-stone-100">
+    <div className="grid grid-cols-2 gap-5 mt-10">
+      <div className="border border-stone-200 dark:border-stone-700 p-5 bg-white dark:bg-stone-900">
+        <div
+          className="font-light text-stone-800 dark:text-stone-100"
+          style={{ fontSize: fontSize?.value || "36px" }}
+        >
           {totalEntries}
         </div>
-        <div className="text-xs text-stone-400 dark:text-stone-500 uppercase tracking-wider mt-1">
+        <div className="text-sm text-stone-400 dark:text-stone-500 uppercase tracking-wider mt-2">
           записей
         </div>
       </div>
-      <div className="border border-stone-200 dark:border-stone-700 p-4 bg-white dark:bg-stone-900">
-        <div className="text-3xl font-light text-stone-800 dark:text-stone-100">
+      <div className="border border-stone-200 dark:border-stone-700 p-5 bg-white dark:bg-stone-900">
+        <div
+          className="font-light text-stone-800 dark:text-stone-100"
+          style={{ fontSize: fontSize?.value || "36px" }}
+        >
           {getStreak()}
         </div>
-        <div className="text-xs text-stone-400 dark:text-stone-500 uppercase tracking-wider mt-1">
+        <div className="text-sm text-stone-400 dark:text-stone-500 uppercase tracking-wider mt-2">
           дней подряд
         </div>
       </div>

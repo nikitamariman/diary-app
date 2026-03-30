@@ -7,9 +7,12 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
-  css: {
-    postcss: {
-      plugins: [],
+  base: '/diary-app/',
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
     },
   },
 })

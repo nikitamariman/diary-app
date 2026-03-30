@@ -1,16 +1,42 @@
-# React + Vite
+# Мысли — личный дневник
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Минималистичное приложение для ведения личного дневника с синхронизацией между устройствами. Записи сохраняются в облаке, доступны с телефона и компьютера.
 
-Currently, two official plugins are available:
+## Демо
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Веб-версия:** [https://nikitamariman.github.io/diary-app/](https://nikitamariman.github.io/diary-app/)
+- **Десктопное приложение:** [Скачать .exe](https://github.com/nikitamariman/diary-desktop/releases)
 
-## React Compiler
+## Технологии
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend:** React + Vite
+- **Стили:** Tailwind CSS v4
+- **База данных:** Supabase
+- **Десктоп:** Tauri
 
-## Expanding the ESLint configuration
+## Функциональность
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- 🔐 Регистрация и вход через email
+- ✍️ Записи с автосохранением (15 секунд)
+- 🗑️ Удаление с 5-секундной отменой
+- 🔍 Поиск по всем записям
+- 🎨 5 цветовых схем + тёмная/светлая тема
+- 📏 Выбор размера шрифта
+- 📥 Экспорт всех записей в Markdown (с выбором папки в десктопной версии)
+- 📱 Адаптивный дизайн
+- 🖥️ Десктопное приложение (Windows, Tauri)
+
+## Структура проекта
+
+src/
+├── components/    
+├── hooks/   
+├── lib/            
+├── utils/      
+├── App.jsx         
+├── index.css     
+└── main.jsx  
+
+## Лицензия
+
+MIT
